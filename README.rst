@@ -3,11 +3,11 @@ GoLang thrift-hive server client
 
 The hive thrift for go interface.  The default thrift server it targets is the cdh3u3, if you want a different version don't use go get.
 
-Install default cdh3u3 server version:
+Install default cdh3u3 server version::
     
     go get github.com/araddon/hive
 
-Install different version:
+Install different version::
     
     # in a gopath src directory
     mkdir -p github.com/araddon
@@ -41,7 +41,7 @@ To create the thrift generated files from scratch
 ----------------------------------------------------
 requires extensive hand editing afterwords to get to work
 
-run these steps:
+run these steps::
 
     thrift --gen go -out . fb303.thrift 
     cd fb303
