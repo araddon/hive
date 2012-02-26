@@ -2,15 +2,15 @@
  *
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  */
-package hive_service;
+package cdh3u3;
 
 import (
         "thrift"
         "fmt"
 )
 
-import "thrifthive/hive_metastore"
-import "thrifthive/queryplan"
+import "github.com/araddon/hive/thriftlib/hive_metastore"
+import "github.com/araddon/hive/thriftlib/queryplan"
 
 type IThriftHive interface {
   hive_metastore.IThriftHiveMetastore
@@ -39,7 +39,8 @@ type ThriftHiveClient struct {
 }
 
 func NewThriftHiveClientFactory(t thrift.TTransport, f thrift.TProtocolFactory) *ThriftHiveClient {
-  return &ThriftHiveClient{hive_metastore.ThriftHiveMetastoreClient: hive_metastore.NewThriftHiveMetastoreClientFactory(t, f)}}
+  return &ThriftHiveClient{hive_metastore.ThriftHiveMetastoreClient: hive_metastore.NewThriftHiveMetastoreClientFactory(t, f)}
+}
 
 func NewThriftHiveClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol) *ThriftHiveClient {
   return &ThriftHiveClient{hive_metastore.ThriftHiveMetastoreClient: hive_metastore.NewThriftHiveMetastoreClientProtocol(t, iprot, oprot)}
@@ -57,7 +58,7 @@ func (p *ThriftHiveClient) Execute(query string) (ex *HiveServerException, err e
 
 func (p *ThriftHiveClient) SendExecute(query string)(err error) {
   oprot := p.OutputProtocol
-  if oprot != nil {
+  if oprot == nil {
     oprot = p.ProtocolFactory.GetProtocol(p.Transport)
     p.OutputProtocol = oprot
   }
@@ -67,7 +68,9 @@ func (p *ThriftHiveClient) SendExecute(query string)(err error) {
   args28.Query = query
   err = args28.Write(oprot)
   oprot.WriteMessageEnd()
+  fmt.Println("about to send transport flush on execuite in thrifthive.go 71")
   oprot.Transport().Flush()
+  fmt.Println("after send transport flush on execuite in thrifthive.go 73")
   return
 }
 
@@ -78,7 +81,9 @@ func (p *ThriftHiveClient) RecvExecute() (ex *HiveServerException, err error) {
     iprot = p.ProtocolFactory.GetProtocol(p.Transport)
     p.InputProtocol = iprot
   }
+  fmt.Println("before read message begin in thrifthive.go 84")
   _, mTypeId, seqId, er := iprot.ReadMessageBegin()
+  fmt.Println("after read message begin in thrifthive.go 86")
   if er != nil {
     err = er
     return
@@ -2428,7 +2433,7 @@ func (p *GetSchemaResult) Read(iprot thrift.TProtocol) (err thrift.TProtocolExce
 }
 
 func (p *GetSchemaResult) ReadField0(iprot thrift.TProtocol) (err thrift.TProtocolException) {
-  p.Success = NewHiveMetastore.ttypes.Schema()
+  p.Success = hive_metastore.NewSchema()
   err117 := p.Success.Read(iprot)
   if err117 != nil { return thrift.NewTProtocolExceptionReadStruct("p.SuccessSchema", err117); }
   return err
@@ -2713,7 +2718,7 @@ func (p *GetThriftSchemaResult) Read(iprot thrift.TProtocol) (err thrift.TProtoc
 }
 
 func (p *GetThriftSchemaResult) ReadField0(iprot thrift.TProtocol) (err thrift.TProtocolException) {
-  p.Success = NewHiveMetastore.ttypes.Schema()
+  p.Success = hive_metastore.NewSchema()
   err123 := p.Success.Read(iprot)
   if err123 != nil { return thrift.NewTProtocolExceptionReadStruct("p.SuccessSchema", err123); }
   return err
@@ -3283,7 +3288,7 @@ func (p *GetQueryPlanResult) Read(iprot thrift.TProtocol) (err thrift.TProtocolE
 }
 
 func (p *GetQueryPlanResult) ReadField0(iprot thrift.TProtocol) (err thrift.TProtocolException) {
-  p.Success = NewQueryplan.ttypes.QueryPlan()
+  p.Success = queryplan.NewQueryPlan()
   err135 := p.Success.Read(iprot)
   if err135 != nil { return thrift.NewTProtocolExceptionReadStruct("p.SuccessQueryPlan", err135); }
   return err

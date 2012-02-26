@@ -9,7 +9,7 @@ import (
         "fmt"
 )
 
-import "thrifthive/fb303"
+import "github.com/araddon/hive/thriftlib/fb303"
 
 type IThriftHiveMetastore interface {
   fb303.IFacebookService
