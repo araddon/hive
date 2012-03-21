@@ -5,7 +5,7 @@
 package fb303;
 
 import (
-        "thrift"
+        "github.com/araddon/thrift4go/lib/go/thrift"
         "fmt"
 )
 
