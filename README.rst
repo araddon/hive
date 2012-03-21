@@ -1,39 +1,46 @@
 GoLang thrift-hive server client
 ===========================================
 
-The hive thrift for go interface.  The default thrift server it targets is the cdh3u3, if you want a different version don't use go get.
+The hive thrift for go interface.  The default thrift server it targets is the cdh3u3 (although teh cdh3u1, u2 appear to be the same, check the branches.)
 
-Install default cdh3u3 server version::
-    
+Install default cdh3 server version:
+
+    go get github.com/araddon/thrift4go/lib/go/thrift
     go get github.com/araddon/hive
-
-Install different version::
-    
-    # in a gopath src directory
-    mkdir -p github.com/araddon
-    cd github.com/araddon
-    git clone git://github.com/araddon/hive.git
-    cd hive
-    git checkout cdh3u2  # etc, see list of branches
-
-    # it is made up of 5 sub-packages 
-    cd thriftlib
-    cd fb303
-    go install
-    cd ../hive_metastore
-    go install
-    cd ../queryplan
-    go install
-    cd ..
-    go install
-    cd ..
-    go install
 
 
 Usage
 ===========
 
-See examples/example.go
+See examples/example.go::
+    
+    import "github.com/araddon/hive"
+    
+    func main() {
+      
+      // checkout a connection
+      conn, err := hive.GetHiveConn("hive")
+      if err == nil {
+
+        //_, _ = conn.Client.Execute("CREATE TABLE rrr(a STRING, b INT, c DOUBLE);")
+        er, err := conn.Client.Execute("SELECT * FROM logevent")
+        if er == nil && err == nil {
+          for {
+            row, _, _ := conn.Client.FetchOne()
+            if len(row) > 0 {
+              log.Println("row ", row)
+            } else {
+              return
+            }
+          }
+        }
+      }
+      if conn != nil {
+        // make sure to check connection back into pool
+        conn.Checkin()
+      }
+    }
+
 
 
 
@@ -71,3 +78,26 @@ need to submit issues...
         should be:
             GetQueryPlan() (retval25 *queryplan.QueryPlan, ex *HiveServerException, err error)
 
+
+
+Install different version::
+    
+    # in a gopath src directory
+    mkdir -p github.com/araddon
+    cd github.com/araddon
+    git clone git://github.com/araddon/hive.git
+    cd hive
+    git checkout cdh3u2  # etc, see list of branches
+
+    # it is made up of 5 sub-packages 
+    cd thriftlib
+    cd fb303
+    go install
+    cd ../hive_metastore
+    go install
+    cd ../queryplan
+    go install
+    cd ..
+    go install
+    cd ..
+    go install

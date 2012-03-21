@@ -5,7 +5,7 @@
 package hive_metastore;
 
 import (
-        "thrift"
+        "github.com/araddon/thrift4go/lib/go/thrift"
         "fmt"
 )
 

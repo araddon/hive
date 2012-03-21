@@ -1,9 +1,38 @@
+/*
+Hive:  The go thrift library for connecting to hive server.   
+
+This is just the generated Thrift-Hive and a very small connection wrapper.
+
+
+Usage:
+
+    func main() {
+      
+      hive.MakePool("192.168.1.17:10000")
+
+      conn, err := GetHiveConn()
+      if err == nil {
+        er, err := conn.Client.Execute("SELECT * FROM logevent")
+        if er == nil && err == nil {
+          for {
+            row, _, _ := conn.Client.FetchOne()
+            if len(row) > 0 {
+              log.Println("row ", row)
+            } else {
+              return
+            }
+          }
+        }
+      }
+    }
+
+*/
 package hive
 
 import (
   "fmt"
   "log"
-  "thrift"
+  "github.com/araddon/thrift4go/lib/go/thrift"
   "net"
   "errors"
   thrifthive "github.com/araddon/hive/thriftlib"
@@ -31,7 +60,7 @@ func MakePool(server string) {
 }
 
 // main entry point for checking out a connection from a list
-func GetHiveConn(db string) (conn *HiveConnection, err error) {
+func GetHiveConn() (conn *HiveConnection, err error) {
   //configMu.Lock()
   //keyspaceConfig, ok := configMap[keyspace]
   //if !ok {
@@ -40,13 +69,13 @@ func GetHiveConn(db string) (conn *HiveConnection, err error) {
   //}
   //configMu.Unlock()
 
-  return getConnFromPool(db) 
+  return getConnFromPool() 
 }
 
-func getConnFromPool(db string) (conn *HiveConnection, err error) {
+func getConnFromPool() (conn *HiveConnection, err error) {
 
   conn = <-hivePool
-  fmt.Printf("in checkout, pulled off pool: remaining = %d, connid=%d Server=%s\n", len(hivePool), conn.Id, conn.Server)
+  log.Printf("in checkout, pulled off pool: remaining = %d, connid=%d Server=%s\n", len(hivePool), conn.Id, conn.Server)
   // BUG(ar):  an error occured on batch mutate <nil> <nil> <nil> Cannot read. Remote side has closed. Tried to read 4 bytes, but only got 0 bytes.
   if conn.Client == nil || conn.Client.Transport.IsOpen() == false {
 
@@ -58,7 +87,7 @@ func getConnFromPool(db string) (conn *HiveConnection, err error) {
 }
 
 // opens a hive connection
-func (conn *HiveConnection) Open(keyspace string) error {
+func (conn *HiveConnection) Open() error {
 
   log.Println("creating new hive connection ")
   tcpConn, er := net.Dial("tcp",conn.Server)
