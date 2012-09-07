@@ -3,7 +3,7 @@ GoLang thrift-hive server client
 
 The hive thrift for go interface.  The default thrift server it targets is the cdh3u3 (although teh cdh3u1, u2 appear to be the same, check the branches.)
 
-Install default cdh3 server version:
+Install default cdh3 server version::
 
     go get github.com/araddon/thrift4go/lib/go/thrift
     go get github.com/araddon/hive
@@ -19,7 +19,7 @@ See examples/example.go::
     func main() {
       
       // checkout a connection
-      conn, err := hive.GetHiveConn("hive")
+      conn, err := hive.GetHiveConn()
       if err == nil {
 
         //_, _ = conn.Client.Execute("CREATE TABLE rrr(a STRING, b INT, c DOUBLE);")
@@ -30,7 +30,7 @@ See examples/example.go::
             if len(row) > 0 {
               log.Println("row ", row)
             } else {
-              return
+              break
             }
           }
         }

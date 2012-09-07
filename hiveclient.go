@@ -7,7 +7,7 @@ This is just the generated Thrift-Hive and a very small connection wrapper.
 Usage:
 
     func main() {
-      
+
       hive.MakePool("192.168.1.17:10000")
 
       conn, err := GetHiveConn()
@@ -16,13 +16,13 @@ Usage:
         if er == nil && err == nil {
           for {
             row, _, _ := conn.Client.FetchOne()
-            if len(row) > 0 {
-              log.Println("row ", row)
-            } else {
-              return
-            }
+            log.Println("row ", row)
           }
         }
+      }
+      if conn != nil {
+        // make sure to check connection back into pool
+        conn.Checkin()
       }
     }
 
@@ -30,18 +30,17 @@ Usage:
 package hive
 
 import (
-  "fmt"
-  "log"
-  "github.com/araddon/thrift4go/lib/go/thrift"
-  "net"
   "errors"
+  "fmt"
   thrifthive "github.com/araddon/hive/thriftlib"
+  "github.com/araddon/thrift4go/lib/go/thrift"
+  "log"
+  "net"
 )
-
 
 type HiveConnection struct {
   Server string
-  Id int
+  Id     int
   Client *thrifthive.ThriftHiveClient
 }
 
@@ -51,12 +50,12 @@ var hivePool chan *HiveConnection
 func MakePool(server string) {
 
   hivePool = make(chan *HiveConnection, 100)
-  
+
   for i := 0; i < 100; i++ {
     // add empty values to the pool
-    hivePool <- &HiveConnection{Server:server, Id:i}
+    hivePool <- &HiveConnection{Server: server, Id: i}
   }
-  
+
 }
 
 // main entry point for checking out a connection from a list
@@ -69,7 +68,7 @@ func GetHiveConn() (conn *HiveConnection, err error) {
   //}
   //configMu.Unlock()
 
-  return getConnFromPool() 
+  return getConnFromPool()
 }
 
 func getConnFromPool() (conn *HiveConnection, err error) {
@@ -79,7 +78,7 @@ func getConnFromPool() (conn *HiveConnection, err error) {
   // BUG(ar):  an error occured on batch mutate <nil> <nil> <nil> Cannot read. Remote side has closed. Tried to read 4 bytes, but only got 0 bytes.
   if conn.Client == nil || conn.Client.Transport.IsOpen() == false {
 
-    err = conn.Open(db)
+    err = conn.Open()
     log.Println(" in create conn, how is client? ", conn.Client, " is err? ", err)
     return conn, err
   }
@@ -90,7 +89,7 @@ func getConnFromPool() (conn *HiveConnection, err error) {
 func (conn *HiveConnection) Open() error {
 
   log.Println("creating new hive connection ")
-  tcpConn, er := net.Dial("tcp",conn.Server)
+  tcpConn, er := net.Dial("tcp", conn.Server)
   if er != nil {
     return er
   }
@@ -102,7 +101,7 @@ func (conn *HiveConnection) Open() error {
   if ts == nil {
     return errors.New("No TSocket connection?")
   }
-  
+
   // the TSocket implements interface TTransport
   //trans := thrift.NewTFramedTransport(ts)
   trans, _ := thrift.NewTNonblockingSocketConn(tcpConn)
@@ -114,7 +113,6 @@ func (conn *HiveConnection) Open() error {
   //NewThriftHiveClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol)
   conn.Client = thrifthive.NewThriftHiveClientFactory(trans, protocolfac)
 
-  
   log.Println("is open? ", trans.IsOpen())
   log.Println(" in conn.Open, how is client? ", conn.Client)
 
@@ -130,15 +128,3 @@ func (conn *HiveConnection) Checkin() {
 
   hivePool <- conn
 }
-
-
-
-
-
-
-
-
-
-
-
-
