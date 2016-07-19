@@ -383,10 +383,10 @@ type ThriftHiveMetastoreClient struct {
 }
 
 func NewThriftHiveMetastoreClientFactory(t thrift.TTransport, f thrift.TProtocolFactory) *ThriftHiveMetastoreClient {
-  return &ThriftHiveMetastoreClient{fb303.FacebookServiceClient: fb303.NewFacebookServiceClientFactory(t, f)}}
+  return &ThriftHiveMetastoreClient{fb303.NewFacebookServiceClientFactory(t, f)}}
 
 func NewThriftHiveMetastoreClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol) *ThriftHiveMetastoreClient {
-  return &ThriftHiveMetastoreClient{fb303.FacebookServiceClient: fb303.NewFacebookServiceClientProtocol(t, iprot, oprot)}
+  return &ThriftHiveMetastoreClient{fb303.NewFacebookServiceClientProtocol(t, iprot, oprot)}
 }
 
 /**
