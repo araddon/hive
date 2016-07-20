@@ -39,11 +39,11 @@ type ThriftHiveClient struct {
 }
 
 func NewThriftHiveClientFactory(t thrift.TTransport, f thrift.TProtocolFactory) *ThriftHiveClient {
-  return &ThriftHiveClient{hive_metastore.ThriftHiveMetastoreClient: hive_metastore.NewThriftHiveMetastoreClientFactory(t, f)}
+  return &ThriftHiveClient{hive_metastore.NewThriftHiveMetastoreClientFactory(t, f)}
 }
 
 func NewThriftHiveClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol) *ThriftHiveClient {
-  return &ThriftHiveClient{hive_metastore.ThriftHiveMetastoreClient: hive_metastore.NewThriftHiveMetastoreClientProtocol(t, iprot, oprot)}
+  return &ThriftHiveClient{hive_metastore.NewThriftHiveMetastoreClientProtocol(t, iprot, oprot)}
 }
 
 /**
